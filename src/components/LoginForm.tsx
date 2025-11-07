@@ -2,7 +2,8 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import React, { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
-import { API_BASE, AuthState } from "./ChatApp";
+import { API_BASE } from "./ChatApp";
+import { AuthState } from "@/types/chat.types";
 
 export default function LoginForm({
   setAuth,

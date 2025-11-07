@@ -10,65 +10,18 @@ import CreateRoomForm from "@/components/CreateRoomForm";
 import ProfileForm from "@/components/ProfileForm";
 import InviteForm from "@/components/InviteForm";
 import LoginForm from "@/components/LoginForm";
-
-type RoomMember = {
-  id: string;
-  username: string;
-  displayColor: string;
-  canAccessHistory?: boolean;
-  joinedAt?: string;
-};
-
-type RoomSummary = {
-  id: string;
-  name: string;
-  isGeneral: boolean;
-  members: RoomMember[];
-  membership?: {
-    canAccessHistory: boolean;
-    joinedAt: string;
-  };
-};
-
-type Message = {
-  id: string;
-  roomId: string;
-  content: string;
-  createdAt: string;
-  sender: {
-    id: string;
-    username: string;
-    displayColor: string;
-  };
-  reactions: {
-    id: string;
-    emoji: string;
-    user: {
-      id: string;
-      username: string;
-      displayColor: string;
-    };
-  }[];
-};
+import {
+  AuthState,
+  Message,
+  PublicUser,
+  RoomMember,
+  RoomSummary,
+} from "@/types/chat.types";
 
 export const API_BASE =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 export const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? API_BASE;
 export const EMOJIS = ["👍", "❤️", "😂", "😮", "🎉", "🔥"];
-
-type PublicUser = {
-  id: string;
-  email: string;
-  username: string;
-  displayColor: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type AuthState = {
-  accessToken: string;
-  user: PublicUser;
-};
 
 const api = axios.create({ baseURL: API_BASE });
 export default function ChatApp() {
