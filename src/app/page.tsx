@@ -10,6 +10,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
+import { FaSpinner } from "react-icons/fa";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? API_BASE;
@@ -70,6 +71,41 @@ type AuthState = {
 };
 
 const api = axios.create({ baseURL: API_BASE });
+
+function getInitials(name: string) {
+  if (!name) return "";
+  const parts = name.trim().split(" ");
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
+
+function UserAvatar({
+  username,
+  color,
+  size = 40,
+}: {
+  username: string;
+  color: string;
+  size?: number;
+}) {
+  const initials = getInitials(username);
+  return (
+    <div
+      className="flex items-center justify-center font-bold text-white select-none"
+      style={{
+        background: color,
+        borderRadius: "9999px",
+        width: size,
+        height: size,
+        fontSize: size * 0.42,
+        textTransform: "uppercase",
+      }}
+      title={username}
+    >
+      {initials}
+    </div>
+  );
+}
 
 function ChatApp() {
   const queryClient = useQueryClient();
@@ -543,14 +579,19 @@ function ChatApp() {
 
             <button
               type="submit"
-              className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white"
+              className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white flex items-center justify-center gap-2"
               disabled={authMutation.isPending}
             >
-              {authMutation.isPending
-                ? "Veuillez patienter…"
-                : authMode === "login"
-                ? "Se connecter"
-                : "Créer un compte"}
+              {authMutation.isPending ? (
+                <>
+                  <FaSpinner className="animate-spin" />
+                  Veuillez patienter…
+                </>
+              ) : authMode === "login" ? (
+                "Se connecter"
+              ) : (
+                "Créer un compte"
+              )}
             </button>
           </form>
         </div>
@@ -561,11 +602,18 @@ function ChatApp() {
   return (
     <div className="grid min-h-screen grid-cols-[280px_1fr] bg-slate-100 text-slate-900">
       <aside className="flex flex-col gap-6 border-r border-slate-200 bg-white p-6">
-        <section className="space-y-1">
+        <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-semibold">{auth.user.username}</p>
-              <p className="text-xs text-slate-500">{auth.user.email}</p>
+            <div className="flex items-center gap-3">
+              <UserAvatar
+                username={auth.user.username}
+                color={auth.user.displayColor}
+                size={44}
+              />
+              <div>
+                <p className="text-sm font-semibold">{auth.user.username}</p>
+                <p className="text-xs text-slate-500">{auth.user.email}</p>
+              </div>
             </div>
             <button
               className="text-xs font-semibold text-red-500"
@@ -581,28 +629,36 @@ function ChatApp() {
             Salons
           </h2>
           <div className="space-y-2 overflow-y-auto">
-            {rooms.map((room: RoomSummary) => (
-              <button
-                key={room.id}
-                onClick={() => setSelectedRoomId(room.id)}
-                className={`w-full rounded border px-3 py-2 text-left text-sm ${
-                  currentRoomId === room.id
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-slate-200 hover:border-blue-400"
-                }`}
-              >
-                <div className="font-medium">{room.name}</div>
-                <div className="text-xs text-slate-500">
-                  {room.isGeneral
-                    ? "Salon général"
-                    : `${room.members.length} membres`}
-                </div>
-              </button>
-            ))}
-            {rooms.length === 0 && (
-              <p className="text-xs text-slate-500">
-                Aucun salon pour le moment
-              </p>
+            {roomsQuery.isLoading ? (
+              <div className="w-full flex justify-center py-6">
+                <FaSpinner className="animate-spin text-lg text-blue-500" />
+              </div>
+            ) : (
+              <>
+                {rooms.map((room: RoomSummary) => (
+                  <button
+                    key={room.id}
+                    onClick={() => setSelectedRoomId(room.id)}
+                    className={`w-full rounded border px-3 py-2 text-left text-sm ${
+                      currentRoomId === room.id
+                        ? "border-blue-500 bg-blue-50"
+                        : "border-slate-200 hover:border-blue-400"
+                    }`}
+                  >
+                    <div className="font-medium">{room.name}</div>
+                    <div className="text-xs text-slate-500">
+                      {room.isGeneral
+                        ? "Salon général"
+                        : `${room.members.length} membres`}
+                    </div>
+                  </button>
+                ))}
+                {rooms.length === 0 && (
+                  <p className="text-xs text-slate-500">
+                    Aucun salon pour le moment
+                  </p>
+                )}
+              </>
             )}
           </div>
         </section>
@@ -619,6 +675,7 @@ function ChatApp() {
           defaultColor={auth.user.displayColor}
           onSubmit={(payload) => updateProfileMutation.mutate(payload)}
           statusMessage={statusMessage}
+          loading={updateProfileMutation.isPending}
         />
       </aside>
 
@@ -641,7 +698,9 @@ function ChatApp() {
             )}
           </div>
           {messagesQuery.isFetching && (
-            <span className="text-xs text-slate-400">Mise à jour…</span>
+            <span className="flex items-center gap-1 text-xs text-slate-400">
+              <FaSpinner className="animate-spin" /> Mise à jour…
+            </span>
           )}
         </header>
 
@@ -649,17 +708,22 @@ function ChatApp() {
           <section className="flex flex-1 flex-col rounded-xl bg-white p-4 shadow">
             <div ref={listRef} className="flex-1 overflow-y-auto space-y-4">
               {messagesQuery.isLoading && (
-                <p className="text-center text-sm text-slate-400">
-                  Chargement…
-                </p>
+                <div className="flex justify-center py-6">
+                  <FaSpinner className="animate-spin text-xl text-blue-600 mr-2" />
+                  <span className="text-center text-sm text-slate-400">
+                    Chargement…
+                  </span>
+                </div>
               )}
               {messages.map((message: Message) => (
                 <article key={message.id} className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span
-                      className="rounded px-2 py-1 text-xs font-semibold text-white"
-                      style={{ backgroundColor: message.sender.displayColor }}
-                    >
+                    <UserAvatar
+                      username={message.sender.username}
+                      color={message.sender.displayColor}
+                      size={28}
+                    />
+                    <span className="text-xs font-semibold text-slate-700">
                       {message.sender.username}
                     </span>
                     <span className="text-xs text-slate-400">
@@ -719,7 +783,7 @@ function ChatApp() {
                 onChange={(event) => handleMessageChange(event.target.value)}
               />
               <button
-                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white flex items-center justify-center gap-1"
                 type="submit"
               >
                 Envoyer
@@ -738,7 +802,14 @@ function ChatApp() {
                     key={member.id}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span>{member.username}</span>
+                    <div className="flex items-center gap-2">
+                      <UserAvatar
+                        username={member.username}
+                        color={member.displayColor}
+                        size={28}
+                      />
+                      <span>{member.username}</span>
+                    </div>
                     {member.id === auth.user.id && (
                       <span className="text-xs text-slate-400">
                         {activeRoom.membership?.canAccessHistory
@@ -854,9 +925,16 @@ function CreateRoomForm({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
+          className="w-full rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white flex items-center justify-center gap-2"
         >
-          {isLoading ? "Création…" : "Créer"}
+          {isLoading ? (
+            <>
+              <FaSpinner className="animate-spin" />
+              Création…
+            </>
+          ) : (
+            "Créer"
+          )}
         </button>
       </form>
     </section>
@@ -868,6 +946,7 @@ type ProfileFormProps = {
   defaultColor: string;
   onSubmit: (payload: { username: string; displayColor: string }) => void;
   statusMessage: string | null;
+  loading?: boolean;
 };
 
 function ProfileForm({
@@ -875,29 +954,43 @@ function ProfileForm({
   defaultColor,
   onSubmit,
   statusMessage,
+  loading = false,
 }: ProfileFormProps) {
+  // Properly initialize state only once and update with useEffect if props change,
+  // but do NOT call setState directly in render (to avoid rendering issues).
   const [username, setUsername] = useState(defaultUsername);
   const [displayColor, setDisplayColor] = useState(defaultColor);
+
+  useEffect(() => {
+    setUsername(defaultUsername);
+  }, [defaultUsername]);
+  useEffect(() => {
+    setDisplayColor(defaultColor);
+  }, [defaultColor]);
 
   return (
     <section className="space-y-2">
       <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
         Profil
       </h2>
+      <div className="flex flex-col items-center my-2">
+        <UserAvatar username={username || " "} color={displayColor} size={48} />
+      </div>
       <form
         className="space-y-2"
         onSubmit={(event) => {
           event.preventDefault();
+          if (!username || !displayColor) return;
           onSubmit({ username, displayColor });
         }}
       >
         <label className="block text-xs">
           <span className="text-slate-600">Nom d’utilisateur</span>
-          <span className="text-slate-600">Nom d’utilisateur</span>
           <input
             className="mt-1 w-full rounded border border-slate-200 px-3 py-2 text-sm"
             value={username}
             onChange={(event) => setUsername(event.target.value)}
+            disabled={loading}
           />
         </label>
         <label className="block text-xs">
@@ -907,6 +1000,7 @@ function ProfileForm({
             className="mt-1 h-10 w-full cursor-pointer rounded border border-slate-200"
             value={displayColor}
             onChange={(event) => setDisplayColor(event.target.value)}
+            disabled={loading}
           />
         </label>
         {statusMessage && (
@@ -914,9 +1008,17 @@ function ProfileForm({
         )}
         <button
           type="submit"
-          className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-semibold text-white"
+          className="w-full rounded bg-slate-900 px-3 py-2 text-sm font-semibold text-white flex items-center justify-center gap-2"
+          disabled={loading}
         >
-          Mettre à jour
+          {loading ? (
+            <>
+              <FaSpinner className="animate-spin" />
+              Mise à jour…
+            </>
+          ) : (
+            "Mettre à jour"
+          )}
         </button>
       </form>
     </section>
