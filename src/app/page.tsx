@@ -17,10 +17,12 @@ import UserAvatar from "@/components/UserAvatar";
 import CreateRoomForm from "@/components/CreateRoomForm";
 import ProfileForm from "@/components/ProfileForm";
 import InviteForm from "@/components/InviteForm";
+import LoginForm from "@/components/LoginForm";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? API_BASE;
-const EMOJIS = ["👍", "❤️", "😂", "😮", "🎉", "🔥"];
+export const API_BASE =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+export const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? API_BASE;
+export const EMOJIS = ["👍", "❤️", "😂", "😮", "🎉", "🔥"];
 
 type PublicUser = {
   id: string;
@@ -71,7 +73,7 @@ type Message = {
   }[];
 };
 
-type AuthState = {
+export type AuthState = {
   accessToken: string;
   user: PublicUser;
 };
@@ -95,19 +97,12 @@ function ChatApp() {
       return null;
     }
   });
-  const [authMode, setAuthMode] = useState<"login" | "register">("login");
-  const [authForm, setAuthForm] = useState({
-    email: "",
-    password: "",
-    username: "",
-    displayColor: "#3b82f6",
-  });
+
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [typingUsers, setTypingUsers] = useState<Record<string, RoomMember[]>>(
     {}
   );
-  const [authError, setAuthError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   const socketRef = useRef<Socket | null>(null);
@@ -267,41 +262,6 @@ function ChatApp() {
     }
   }, [messagesQuery.data, currentRoomId]);
 
-  const registerOrLogin = async () => {
-    const url = `${API_BASE}/auth/${
-      authMode === "register" ? "register" : "login"
-    }`;
-    const payload: Record<string, string> = {
-      email: authForm.email,
-      password: authForm.password,
-    };
-    if (authMode === "register") {
-      payload.username = authForm.username;
-      payload.displayColor = authForm.displayColor;
-    }
-    const response = await axios.post(url, payload);
-    return response.data as AuthState;
-  };
-
-  const authMutation = useMutation({
-    mutationFn: registerOrLogin,
-    onSuccess: (data: AuthState) => {
-      setAuth(data);
-      setAuthForm({
-        email: "",
-        password: "",
-        username: "",
-        displayColor: "#3b82f6",
-      });
-      setAuthError(null);
-    },
-    onError: (error: unknown) => {
-      setAuthError(
-        error instanceof Error ? error.message : "Action impossible"
-      );
-    },
-  });
-
   const updateProfileMutation = useMutation({
     mutationFn: async (updates: { username: string; displayColor: string }) => {
       const response = await api.patch<PublicUser>("/users/me", updates, {
@@ -441,133 +401,7 @@ function ChatApp() {
   const currentTypers = currentRoomId ? typingUsers[currentRoomId] ?? [] : [];
 
   if (!auth) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-100 p-6">
-        <div className="w-full max-w-md space-y-6 rounded-xl bg-white p-8 shadow">
-          <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-semibold text-slate-900">Chat App</h1>
-            <div className="flex gap-2 text-xs">
-              <button
-                type="button"
-                className={`rounded px-3 py-1 ${
-                  authMode === "login"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-200"
-                }`}
-                onClick={() => setAuthMode("login")}
-              >
-                Connexion
-              </button>
-              <button
-                type="button"
-                className={`rounded px-3 py-1 ${
-                  authMode === "register"
-                    ? "bg-blue-600 text-white"
-                    : "bg-slate-200"
-                }`}
-                onClick={() => setAuthMode("register")}
-              >
-                Inscription
-              </button>
-            </div>
-          </div>
-
-          <form
-            className="space-y-4"
-            onSubmit={(event) => {
-              event.preventDefault();
-              setAuthError(null);
-              authMutation.mutate();
-            }}
-          >
-            <label className="block text-sm">
-              <span className="text-slate-600">Email</span>
-              <input
-                className="mt-1 w-full rounded border border-slate-200 px-3 py-2"
-                type="email"
-                required
-                value={authForm.email}
-                onChange={(event) =>
-                  setAuthForm((prev) => ({
-                    ...prev,
-                    email: event.target.value,
-                  }))
-                }
-              />
-            </label>
-
-            {authMode === "register" && (
-              <label className="block text-sm">
-                <span className="text-slate-600">Nom d’utilisateur</span>
-                <input
-                  className="mt-1 w-full rounded border border-slate-200 px-3 py-2"
-                  required
-                  value={authForm.username}
-                  onChange={(event) =>
-                    setAuthForm((prev) => ({
-                      ...prev,
-                      username: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-            )}
-
-            <label className="block text-sm">
-              <span className="text-slate-600">Mot de passe</span>
-              <input
-                className="mt-1 w-full rounded border border-slate-200 px-3 py-2"
-                type="password"
-                required
-                value={authForm.password}
-                onChange={(event) =>
-                  setAuthForm((prev) => ({
-                    ...prev,
-                    password: event.target.value,
-                  }))
-                }
-              />
-            </label>
-
-            {authMode === "register" && (
-              <label className="block text-sm">
-                <span className="text-slate-600">Couleur</span>
-                <input
-                  className="mt-1 h-10 w-full cursor-pointer rounded border border-slate-200"
-                  type="color"
-                  value={authForm.displayColor}
-                  onChange={(event) =>
-                    setAuthForm((prev) => ({
-                      ...prev,
-                      displayColor: event.target.value,
-                    }))
-                  }
-                />
-              </label>
-            )}
-
-            {authError && <p className="text-sm text-red-500">{authError}</p>}
-
-            <button
-              type="submit"
-              className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-semibold text-white flex items-center justify-center gap-2"
-              disabled={authMutation.isPending}
-            >
-              {authMutation.isPending ? (
-                <>
-                  <FaSpinner className="animate-spin" />
-                  Veuillez patienter…
-                </>
-              ) : authMode === "login" ? (
-                "Se connecter"
-              ) : (
-                "Créer un compte"
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
-    );
+    return <LoginForm setAuth={setAuth} />;
   }
 
   return (
