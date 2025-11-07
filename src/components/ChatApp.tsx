@@ -1,10 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import axios from "axios";
 import { io, Socket } from "socket.io-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FaSpinner } from "react-icons/fa";
 
-// Import des composants du dossier components
 import UserAvatar from "@/components/UserAvatar";
 import CreateRoomForm from "@/components/CreateRoomForm";
 import ProfileForm from "@/components/ProfileForm";
@@ -17,13 +15,11 @@ import {
   RoomMember,
   RoomSummary,
 } from "@/types/chat.types";
+import api, { API_BASE } from "@/lib/apiClient";
 
-export const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 export const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? API_BASE;
 export const EMOJIS = ["👍", "❤️", "😂", "😮", "🎉", "🔥"];
 
-const api = axios.create({ baseURL: API_BASE });
 export default function ChatApp() {
   const queryClient = useQueryClient();
   const [auth, setAuth] = useState<AuthState | null>(() => {
