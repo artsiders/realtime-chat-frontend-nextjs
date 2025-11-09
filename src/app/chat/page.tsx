@@ -3,19 +3,19 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/store/authStore";
-import AuthForm from "@/components/AuthForm";
+import ChatRoom from "@/components/ChatRoom";
 
-export default function Home() {
+export default function ChatPage() {
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
-      router.push("/chat");
+    if (!user) {
+      router.push("/");
     }
   }, [user, router]);
 
-  if (user) return null;
+  if (!user) return null;
 
-  return <AuthForm />;
+  return <ChatRoom />;
 }
