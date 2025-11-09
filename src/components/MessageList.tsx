@@ -64,7 +64,18 @@ export default function MessageList({
                 </div>
               )}
 
-              <div className={`message-bubble ${isMe ? "me" : "other"}`}>
+              {/* BUBBLE: plus de gradient, couleurs simples, bulle autre claire mais visible sur fond blanc */}
+              <div
+                className={`message-bubble`}
+                style={{
+                  background: isMe ? "#3b82f6" : "#f1f5f9", // bleu solide ou gris clair (bg-slate-100)
+                  color: isMe ? "#fff" : "#22223b", // blanc pour moi, presque noir pour autres
+                  borderRadius: isMe
+                    ? "16px 16px 4px 16px"
+                    : "16px 16px 16px 4px",
+                  border: isMe ? "1px solid #3b82f6" : "1px solid #e5e7eb", // bordure gris sur bulle claire
+                }}
+              >
                 {msg.content}
               </div>
 
