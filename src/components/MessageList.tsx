@@ -72,9 +72,6 @@ export default function MessageList({
                   isMe
                     ? "bg-blue-500 text-white border border-blue-500"
                     : "bg-slate-100 text-[#22223b] border border-gray-200",
-                  isMe
-                    ? "rounded-tl-lg rounded-tr-lg rounded-br-sm rounded-bl-lg"
-                    : "rounded-tl-lg rounded-tr-lg rounded-br-lg rounded-bl-sm",
                   "px-4 py-2",
                   "max-w-[72%]",
                   "min-w-xs",
@@ -84,6 +81,21 @@ export default function MessageList({
                   "break-normal",
                   "whitespace-pre-line",
                 ].join(" ")}
+                style={
+                  isMe
+                    ? {
+                        borderTopLeftRadius: 18,
+                        borderTopRightRadius: 18,
+                        borderBottomRightRadius: 6,
+                        borderBottomLeftRadius: 18,
+                      }
+                    : {
+                        borderTopLeftRadius: 18,
+                        borderTopRightRadius: 18,
+                        borderBottomRightRadius: 18,
+                        borderBottomLeftRadius: 6,
+                      }
+                }
               >
                 {msg.content}
               </div>
