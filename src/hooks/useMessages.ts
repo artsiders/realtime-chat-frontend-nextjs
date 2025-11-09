@@ -41,7 +41,11 @@ export const useMessages = (roomId: number | null) => {
     );
 
     socket.on("newMessage", (message: Message) => {
-      setMessages((prev) => [...prev, message]);
+      setMessages((prev) => {
+        // Avoid duplicates: if the message (by id) already exists, skip
+        if (prev.some((m) => m.id === message.id)) return prev;
+        return [...prev, message];
+      });
     });
 
     socket.on("reactionUpdated", () => {
@@ -62,7 +66,12 @@ export const useMessages = (roomId: number | null) => {
       { roomId, userId, content },
       (sentMessage: Message) => {
         if (sentMessage) {
-          setMessages((prev) => [...prev, sentMessage]);
+          setMessages((prev) => {
+            // The server will broadcast the message to the room as well;
+            // prevent adding a duplicate if we already have it.
+            if (prev.some((m) => m.id === sentMessage.id)) return prev;
+            return [...prev, sentMessage];
+          });
         }
       }
     );
