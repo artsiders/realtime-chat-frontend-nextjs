@@ -40,6 +40,7 @@ export default function MessageList({
 
         return (
           <div key={msg.id} className={`message-row ${isMe ? "me" : ""}`}>
+            {/* Avatar left */}
             {!isMe && (
               <div
                 className="avatar-small flex items-center justify-center text-white font-bold"
@@ -49,6 +50,7 @@ export default function MessageList({
               </div>
             )}
 
+            {/* Content */}
             <div className="flex flex-col">
               {!isMe && (
                 <div className="flex items-center gap-2 mb-1">
@@ -64,17 +66,24 @@ export default function MessageList({
                 </div>
               )}
 
-              {/* BUBBLE: plus de gradient, couleurs simples, bulle autre claire mais visible sur fond blanc */}
               <div
-                className={`message-bubble`}
-                style={{
-                  background: isMe ? "#3b82f6" : "#f1f5f9", // bleu solide ou gris clair (bg-slate-100)
-                  color: isMe ? "#fff" : "#22223b", // blanc pour moi, presque noir pour autres
-                  borderRadius: isMe
-                    ? "16px 16px 4px 16px"
-                    : "16px 16px 16px 4px",
-                  border: isMe ? "1px solid #3b82f6" : "1px solid #e5e7eb", // bordure gris sur bulle claire
-                }}
+                className={[
+                  "message-bubble",
+                  isMe
+                    ? "bg-blue-500 text-white border border-blue-500"
+                    : "bg-slate-100 text-[#22223b] border border-gray-200",
+                  isMe
+                    ? "rounded-tl-lg rounded-tr-lg rounded-br-sm rounded-bl-lg"
+                    : "rounded-tl-lg rounded-tr-lg rounded-br-lg rounded-bl-sm",
+                  "px-4 py-2",
+                  "max-w-[72%]",
+                  "min-w-xs",
+                  "text-base",
+                  "leading-snug",
+                  "overflow-x-auto",
+                  "break-normal",
+                  "whitespace-pre-line",
+                ].join(" ")}
               >
                 {msg.content}
               </div>
@@ -106,6 +115,7 @@ export default function MessageList({
               </div>
             </div>
 
+            {/* Avatar right */}
             {isMe && (
               <div
                 className="avatar-small flex items-center justify-center text-white font-bold ml-2"
