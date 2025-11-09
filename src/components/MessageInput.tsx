@@ -36,20 +36,23 @@ export default function MessageInput({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="border-t p-4">
-      <div className="flex gap-2">
+    <form onSubmit={handleSubmit} className="input-row">
+      <div className="flex items-center gap-3">
         <input
           type="text"
           value={message}
           onChange={handleChange}
           placeholder="Envoyer un message..."
-          className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-400"
         />
+
         <button
           type="submit"
-          className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+          aria-label="Envoyer"
+          className="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 flex items-center justify-center"
         >
-          Envoyer
+          {/* simple chevron icon via text to avoid new deps */}
+          <span style={{ transform: "rotate(45deg)" }}>➤</span>
         </button>
       </div>
     </form>

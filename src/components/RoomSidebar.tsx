@@ -36,13 +36,13 @@ export default function RoomSidebar({
 
   return (
     <>
-      <div className="w-64 bg-gray-800 text-white flex flex-col">
-        <div className="p-4 border-b border-gray-700">
-          <h2 className="text-xl font-bold">Chat App</h2>
+      <div className="w-72 sidebar-card flex flex-col">
+        <div className="p-4">
+          <h2 className="text-lg font-semibold">Chat App</h2>
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          <div className="p-2">
+          <div className="p-3">
             <button
               onClick={() => setShowCreateModal(true)}
               className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 mb-2"
@@ -50,41 +50,49 @@ export default function RoomSidebar({
               + Créer un salon
             </button>
           </div>
-          {rooms.map((room) => (
-            <button
-              key={room.id}
-              onClick={() => onRoomSelect(room.id)}
-              className={`w-full text-left px-4 py-2 hover:bg-gray-700 ${
-                currentRoomId === room.id ? "bg-gray-700" : ""
-              }`}
-            >
-              # {room.name}
-            </button>
-          ))}
+          <div className="space-y-1 px-2">
+            {rooms.map((room) => (
+              <button
+                key={room.id}
+                onClick={() => onRoomSelect(room.id)}
+                className={`w-full text-left px-4 py-3 rounded-md hover:bg-gray-100 flex items-center gap-2 ${
+                  currentRoomId === room.id
+                    ? "bg-blue-50 border-l-4 border-blue-500"
+                    : ""
+                }`}
+              >
+                <span className="text-sm text-gray-700"># {room.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="p-4 border-t border-gray-700">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="p-4">
+          <div className="flex items-center gap-3 mb-2">
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center font-bold"
+              className="w-10 h-10 rounded-full flex items-center justify-center font-bold"
               style={{ backgroundColor: color }}
             >
               {username[0].toUpperCase()}
             </div>
-            <span className="flex-1 truncate">{username}</span>
+            <div className="flex-1">
+              <div className="text-sm font-medium truncate">{username}</div>
+            </div>
           </div>
-          <button
-            onClick={() => setShowProfileModal(true)}
-            className="w-full bg-gray-700 py-2 rounded hover:bg-gray-600 mb-2"
-          >
-            Profil
-          </button>
-          <button
-            onClick={onLogout}
-            className="w-full bg-red-600 py-2 rounded hover:bg-red-700"
-          >
-            Déconnexion
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowProfileModal(true)}
+              className="flex-1 bg-gray-100 py-2 rounded hover:bg-gray-200"
+            >
+              Profil
+            </button>
+            <button
+              onClick={onLogout}
+              className="flex-1 bg-red-600 text-white py-2 rounded hover:bg-red-700"
+            >
+              Déco
+            </button>
+          </div>
         </div>
       </div>
 

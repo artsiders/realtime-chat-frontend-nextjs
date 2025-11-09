@@ -26,49 +26,50 @@ export default function ChatRoom() {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen">
-      <RoomSidebar
-        rooms={rooms}
-        currentRoomId={currentRoomId}
-        onRoomSelect={setCurrentRoomId}
-        onCreateRoom={createRoom}
-        onLogout={logout}
-        username={user.username}
-        color={user.color}
-      />
-
-      <div className="flex-1 flex flex-col">
-        <div className="bg-white border-b p-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold">
-            # {rooms.find((r) => r.id === currentRoomId)?.name || "Salon"}
-          </h1>
-          <div className="flex items-center gap-2">
-            <span
-              className={`w-2 h-2 rounded-full ${
-                isConnected ? "bg-green-500" : "bg-red-500"
-              }`}
-            />
-            <span className="text-sm text-gray-600">
-              {isConnected ? "Connecté" : "Déconnecté"}
-            </span>
+    <div className="app-shell">
+      <div className="chat-panel">
+        <RoomSidebar
+          rooms={rooms}
+          currentRoomId={currentRoomId}
+          onRoomSelect={setCurrentRoomId}
+          onCreateRoom={createRoom}
+          onLogout={logout}
+          username={user.username}
+          color={user.color}
+        />
+        <div className="chat-content">
+          <div className="header-panel flex items-center justify-between">
+            <h1 className="text-lg font-semibold">
+              # {rooms.find((r) => r.id === currentRoomId)?.name || "Salon"}
+            </h1>
+            <div className="flex items-center gap-3">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isConnected ? "bg-green-500" : "bg-red-500"
+                }`}
+              />
+              <span className="text-sm muted">
+                {isConnected ? "Connecté" : "Déconnecté"}
+              </span>
+            </div>
           </div>
+
+          <MessageList
+            messages={messages}
+            currentUserId={user.id}
+            onAddReaction={(messageId, emoji) =>
+              addReaction(messageId, user.id, emoji)
+            }
+          />
+
+          <TypingIndicator usernames={typingUsers} />
+
+          <MessageInput
+            onSend={(content) => sendMessage(content, user.id)}
+            onTyping={startTyping}
+            onStopTyping={stopTyping}
+          />
         </div>
-
-        <MessageList
-          messages={messages}
-          currentUserId={user.id}
-          onAddReaction={(messageId, emoji) =>
-            addReaction(messageId, user.id, emoji)
-          }
-        />
-
-        <TypingIndicator usernames={typingUsers} />
-
-        <MessageInput
-          onSend={(content) => sendMessage(content, user.id)}
-          onTyping={startTyping}
-          onStopTyping={stopTyping}
-        />
       </div>
     </div>
   );
