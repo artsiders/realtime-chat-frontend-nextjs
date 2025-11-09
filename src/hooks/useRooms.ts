@@ -49,12 +49,18 @@ export const useRooms = () => {
     giveHistoryAccess: boolean
   ) => {
     if (!user) return;
-    socket.emit("createRoom", {
-      name,
-      creatorId: user.id,
-      memberIds,
-      giveHistoryAccess,
-    });
+    socket.emit(
+      "createRoom",
+      {
+        name,
+        creatorId: user.id,
+        memberIds,
+        giveHistoryAccess,
+      },
+      (room: Room) => {
+        setRooms((prev) => [...prev, room]);
+      }
+    );
   };
 
   return { rooms, currentRoomId, setCurrentRoomId, createRoom };

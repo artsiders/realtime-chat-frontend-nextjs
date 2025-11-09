@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getSocket } from "@/lib/socket";
+import { useAuthStore } from "@/store/authStore";
 
 interface User {
   id: number;
@@ -24,13 +25,16 @@ interface Message {
 export const useMessages = (roomId: number | null) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const socket = getSocket();
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
     if (!roomId) return;
 
+    if (!user) return;
+
     socket.emit(
       "joinRoom",
-      { roomId, userId: 1 },
+      { roomId, userId: user.id },
       (response: { messages: Message[] }) => {
         setMessages(response.messages || []);
       }
@@ -48,11 +52,20 @@ export const useMessages = (roomId: number | null) => {
       socket.off("newMessage");
       socket.off("reactionUpdated");
     };
-  }, [roomId, socket]);
+  }, [roomId, socket, user]);
 
   const sendMessage = (content: string, userId: number) => {
     if (!roomId) return;
-    socket.emit("sendMessage", { roomId, userId, content });
+    // use acknowledgement to get the saved/sent message from the server
+    socket.emit(
+      "sendMessage",
+      { roomId, userId, content },
+      (sentMessage: Message) => {
+        if (sentMessage) {
+          setMessages((prev) => [...prev, sentMessage]);
+        }
+      }
+    );
   };
 
   const addReaction = (messageId: number, userId: number, emoji: string) => {
