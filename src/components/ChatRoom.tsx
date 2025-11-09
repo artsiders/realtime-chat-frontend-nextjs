@@ -5,7 +5,6 @@ import { useMessages } from "@/hooks/useMessages";
 import { useRooms } from "@/hooks/useRooms";
 import { useTyping } from "@/hooks/useTyping";
 import { useAuth } from "@/hooks/useAuth";
-import { useSocket } from "@/hooks/useSocket";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import RoomSidebar from "./RoomSidebar";
@@ -14,7 +13,6 @@ import TypingIndicator from "./TypingIndicator";
 export default function ChatRoom() {
   const { user } = useAuthStore();
   const { logout } = useAuth();
-  const { isConnected } = useSocket();
   const { rooms, currentRoomId, setCurrentRoomId, createRoom } = useRooms();
   const { messages, sendMessage, addReaction } = useMessages(currentRoomId);
   const { typingUsers, startTyping, stopTyping } = useTyping(
@@ -42,16 +40,6 @@ export default function ChatRoom() {
             <h1 className="text-lg font-semibold">
               # {rooms.find((r) => r.id === currentRoomId)?.name || "Salon"}
             </h1>
-            <div className="flex items-center gap-3">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isConnected ? "bg-green-500" : "bg-red-500"
-                }`}
-              />
-              <span className="text-sm muted">
-                {isConnected ? "Connecté" : "Déconnecté"}
-              </span>
-            </div>
           </div>
 
           <MessageList
