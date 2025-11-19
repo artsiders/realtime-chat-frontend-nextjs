@@ -19,11 +19,6 @@ interface RoomSidebarProps {
   rooms: Room[];
   currentRoomId: number | null;
   onRoomSelect: (roomId: number) => void;
-  onCreateRoom: (
-    name: string,
-    memberIds: number[],
-    giveHistoryAccess: boolean
-  ) => void;
   onLogout: () => void;
   username: string;
   color: string;
@@ -33,7 +28,6 @@ export default function RoomSidebar({
   rooms,
   currentRoomId,
   onRoomSelect,
-  onCreateRoom,
   onLogout,
   username,
   color,
@@ -149,10 +143,7 @@ export default function RoomSidebar({
       </div>
 
       {showCreateModal && (
-        <CreateRoomModal
-          onClose={() => setShowCreateModal(false)}
-          onCreate={onCreateRoom}
-        />
+        <CreateRoomModal onClose={() => setShowCreateModal(false)} />
       )}
 
       {showProfileModal && (

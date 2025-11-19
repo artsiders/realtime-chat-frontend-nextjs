@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { userApi } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
+import { useRooms } from "@/hooks/useRooms";
 
 interface User {
   id: number;
@@ -11,18 +12,11 @@ interface User {
 
 interface CreateRoomModalProps {
   onClose: () => void;
-  onCreate: (
-    name: string,
-    memberIds: number[],
-    giveHistoryAccess: boolean
-  ) => void;
 }
 
-export default function CreateRoomModal({
-  onClose,
-  onCreate,
-}: CreateRoomModalProps) {
+export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
   const [name, setName] = useState("");
+  const { createRoom } = useRooms();
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [giveHistoryAccess, setGiveHistoryAccess] = useState(true);
   const currentUser = useAuthStore((state) => state.user);
@@ -37,7 +31,7 @@ export default function CreateRoomModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onCreate(name, selectedUsers, giveHistoryAccess);
+    createRoom(name, selectedUsers, giveHistoryAccess);
     onClose();
   };
 

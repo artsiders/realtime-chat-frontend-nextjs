@@ -13,7 +13,7 @@ import TypingIndicator from "./TypingIndicator";
 export default function ChatRoom() {
   const { user } = useAuthStore();
   const { logout } = useAuth();
-  const { rooms, currentRoomId, setCurrentRoomId, createRoom } = useRooms();
+  const { rooms, currentRoomId, setCurrentRoomId } = useRooms();
   const { messages, sendMessage, addReaction } = useMessages(currentRoomId);
   const { typingUsers, startTyping, stopTyping } = useTyping(
     currentRoomId,
@@ -30,7 +30,6 @@ export default function ChatRoom() {
           rooms={rooms}
           currentRoomId={currentRoomId}
           onRoomSelect={setCurrentRoomId}
-          onCreateRoom={createRoom}
           onLogout={logout}
           username={user.username}
           color={user.color}
