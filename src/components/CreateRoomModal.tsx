@@ -29,10 +29,19 @@ export default function CreateRoomModal({ onClose }: CreateRoomModalProps) {
   const users: User[] =
     usersResponse?.data?.filter((u: User) => u.id !== currentUser?.id) || [];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    createRoom(name, selectedUsers, giveHistoryAccess);
-    onClose();
+
+    if (!name.trim()) {
+      return;
+    }
+
+    try {
+      await createRoom(name, selectedUsers, giveHistoryAccess);
+      onClose();
+    } catch (error) {
+      console.error("Erreur lors de la création du salon:", error);
+    }
   };
 
   const toggleUser = (userId: number) => {
