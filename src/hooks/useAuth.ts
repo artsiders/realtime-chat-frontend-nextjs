@@ -3,44 +3,39 @@ import { authApi } from "@/lib/api";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { LoginRequest, RegisterRequest } from "@/types/auth.types";
+import { AxiosError } from "axios";
 
 export const useAuth = () => {
   const { user, setUser, logout: logoutStore } = useAuthStore();
   const router = useRouter();
 
   const loginMutation = useMutation({
-    mutationFn: ({
-      username,
-      password,
-    }: {
-      username: string;
-      password: string;
-    }) => authApi.login(username, password),
+    mutationFn: ({ username, password }: LoginRequest) =>
+      authApi.login(username, password),
     onSuccess: (response) => {
       setUser(response.data);
       toast.success("Connecté avec succès!");
       router.push("/chat");
     },
-    onError: () => {
-      toast.error("Identifiants invalides");
+    onError: (error: AxiosError<{ message: string }>) => {
+      const message = error.response?.data?.message || "Identifiants invalides";
+      toast.error(message);
     },
   });
 
   const registerMutation = useMutation({
-    mutationFn: ({
-      username,
-      password,
-    }: {
-      username: string;
-      password: string;
-    }) => authApi.register(username, password),
+    mutationFn: ({ username, password }: RegisterRequest) =>
+      authApi.register(username, password),
     onSuccess: (response) => {
       setUser(response.data);
       toast.success("Compte créé avec succès!");
       router.push("/chat");
     },
-    onError: () => {
-      toast.error("Nom d'utilisateur déjà pris");
+    onError: (error: AxiosError<{ message: string }>) => {
+      const message =
+        error.response?.data?.message || "Erreur lors de l'inscription";
+      toast.error(message);
     },
   });
 
