@@ -34,6 +34,8 @@ export default function RoomSidebar({
 }: RoomSidebarProps) {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const displayUsername = username || "Utilisateur";
+  const avatarInitial = displayUsername.charAt(0).toUpperCase() || "?";
 
   // Add a friendly greeting
   const getGreeting = () => {
@@ -52,7 +54,8 @@ export default function RoomSidebar({
             ChatApp
           </h2>
           <span className="text-xs text-gray-500">
-            {getGreeting()}, <span className="font-semibold">{username}!</span>
+            {getGreeting()},{" "}
+            <span className="font-semibold">{displayUsername}!</span>
           </span>
         </div>
 
@@ -113,10 +116,12 @@ export default function RoomSidebar({
               }}
               title="Votre avatar"
             >
-              {username[0]?.toUpperCase() || "?"}
+              {avatarInitial}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-base font-semibold truncate">{username}</div>
+              <div className="text-base font-semibold truncate">
+                {displayUsername}
+              </div>
               <span className="text-xs text-gray-400">Connecté</span>
             </div>
           </div>
@@ -149,7 +154,7 @@ export default function RoomSidebar({
       {showProfileModal && (
         <ProfileModal
           onClose={() => setShowProfileModal(false)}
-          currentUsername={username}
+          currentUsername={displayUsername}
           currentColor={color}
         />
       )}

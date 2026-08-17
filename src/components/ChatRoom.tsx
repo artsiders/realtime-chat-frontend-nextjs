@@ -15,10 +15,12 @@ export default function ChatRoom() {
   const { logout } = useAuth();
   const { rooms, currentRoomId, setCurrentRoomId } = useRooms();
   const { messages, sendMessage, addReaction } = useMessages(currentRoomId);
+  const username = user?.username || "Utilisateur";
+  const color = user?.color || "#2563eb";
   const { typingUsers, startTyping, stopTyping } = useTyping(
     currentRoomId,
     user?.id || 0,
-    user?.username || ""
+    username
   );
 
   if (!user) return null;
@@ -31,8 +33,8 @@ export default function ChatRoom() {
           currentRoomId={currentRoomId}
           onRoomSelect={setCurrentRoomId}
           onLogout={logout}
-          username={user.username}
-          color={user.color}
+          username={username}
+          color={color}
         />
         <div className="chat-content">
           <div className="header-panel flex items-center justify-between">

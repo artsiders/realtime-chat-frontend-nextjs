@@ -4,9 +4,21 @@ import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
+type AuthUser = {
+  id: number;
+  username: string;
+  color: string;
+};
+
+type AuthResponse = AuthUser | { user: AuthUser };
+
 export const useAuth = () => {
   const { user, setUser, logout: logoutStore } = useAuthStore();
   const router = useRouter();
+
+  const setAuthenticatedUser = (data: AuthResponse) => {
+    setUser("user" in data ? data.user : data);
+  };
 
   const loginMutation = useMutation({
     mutationFn: ({
@@ -17,7 +29,7 @@ export const useAuth = () => {
       password: string;
     }) => authApi.login(username, password),
     onSuccess: (response) => {
-      setUser(response.data);
+      setAuthenticatedUser(response.data);
       toast.success("Connecté avec succès!");
       router.push("/chat");
     },
@@ -35,7 +47,7 @@ export const useAuth = () => {
       password: string;
     }) => authApi.register(username, password),
     onSuccess: (response) => {
-      setUser(response.data);
+      setAuthenticatedUser(response.data);
       toast.success("Compte créé avec succès!");
       router.push("/chat");
     },
