@@ -5,16 +5,18 @@ import { useAuth } from "@/hooks/useAuth";
 
 export default function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [displayColor, setDisplayColor] = useState("#3b82f6");
   const { login, register, isLoading } = useAuth();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isLogin) {
-      login({ username, password });
+      login({ email, password });
     } else {
-      register({ username, password });
+      register({ email, username, password, displayColor });
     }
   };
 
@@ -26,13 +28,23 @@ export default function AuthForm() {
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+          {!isLogin && (
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          )}
           <input
             type="password"
             placeholder="Password"
@@ -41,6 +53,15 @@ export default function AuthForm() {
             className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
+          {!isLogin && (
+            <input
+              type="color"
+              aria-label="Couleur du profil"
+              value={displayColor}
+              onChange={(e) => setDisplayColor(e.target.value)}
+              className="w-full h-10 px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          )}
           <button
             type="submit"
             disabled={isLoading}

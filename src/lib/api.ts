@@ -5,10 +5,14 @@ export const api = axios.create({
 });
 
 export const authApi = {
-  register: (username: string, password: string) =>
-    api.post("/auth/register", { username, password }),
-  login: (username: string, password: string) =>
-    api.post("/auth/login", { username, password }),
+  register: (
+    email: string,
+    username: string,
+    password: string,
+    displayColor: string
+  ) => api.post("/auth/register", { email, username, password, displayColor }),
+  login: (email: string, password: string) =>
+    api.post("/auth/login", { email, password }),
 };
 
 export const userApi = {
